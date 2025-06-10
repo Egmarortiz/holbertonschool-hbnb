@@ -2,17 +2,14 @@ graph LR
   subgraph Presentation Layer
     PL["Service API<br/>(HTTP Controllers, DTOs)"]
   end
-
   subgraph Business Logic Layer
     BLF["HBnBFacade <<interface>>"]
     UM["User, Place, Review, Amenity<br/>Models & Services"]
   end
-
   subgraph Persistence Layer
     PR["Repositories / DAOs<br/>(UserRepo, PlaceRepo, ReviewRepo, AmenityRepo)"]
   end
 
-  PL --> BLF : uses
-  BLF --> UM : delegates business logic
-  UM --> PR : reads & writes data
-
+  PL -->|uses| BLF
+  BLF -->|delegates business logic| UM
+  UM -->|reads & writes data| PR
