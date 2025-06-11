@@ -214,5 +214,5 @@ sequenceDiagram
 
 ## Conclusion
 
-This document unifies the architectural vision and detailed design of HBnB Evolution, from high‑level layering to low‑level interactions. It will serve as the definitive reference during implementation, ensuring consistency, clarity, and adherence to core design principles.
+This document unifies the architectural vision and detailed design of HBnB Evolution, from high‑level layering to low‑level interactions. It will serve as the definitive reference during implementation, ensuring consistency, clarity, and adherence to core design principles. For my fellow devs, feel free to iterate on these diagrams and notes as the project evolves.
 
