@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant User
+    participant API as Presentation Layer
+    participant BL as Business Logic Layer
+    participant DB as Persistence Layer
+
+    %% 3. Review Submission
+    User->>API: POST /places/{placeId}/reviews {rating, comment}
+    API->>BL: submitReview(userId, placeId, reviewData)
+    BL->>BL: validate rating, check user & place exist
+    BL->>DB: INSERT INTO reviews (...)
+    DB-->>BL: new review record (with id, timestamps)
+    BL->>DB: UPDATE places SET avgRating = ... WHERE id = placeId
+    DB-->>BL: confirmation of update
+    BL-->>API: ReviewDTO {id, rating, comment}
+    API-->>User: 201 Created {review info}
+

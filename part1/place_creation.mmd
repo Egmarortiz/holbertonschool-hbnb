@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant User
+    participant API as Presentation Layer
+    participant BL as Business Logic Layer
+    participant DB as Persistence Layer
+
+    %% 2. Place Creation
+    User->>API: POST /places {title, description, pricePerNight, lat, lng}
+    API->>BL: createPlace(userId, placeData)
+    BL->>BL: authorize owner, validate data
+    BL->>DB: INSERT INTO places (...)
+    DB-->>BL: new place record (with id, timestamps)
+    BL-->>API: PlaceDTO {id, title, pricePerNight, ownerId}
+    API-->>User: 201 Created {place info}
+

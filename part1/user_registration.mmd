@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant User
+    participant API as Presentation Layer
+    participant BL as Business Logic Layer
+    participant DB as Persistence Layer
+
+    %% 1. User Registration
+    User->>API: POST /users/register {firstName, lastName, email, password}
+    API->>BL: registerUser(data)
+    BL->>BL: validate data, hash password
+    BL->>DB: INSERT INTO users (...)
+    DB-->>BL: new user record (with id, timestamps)
+    BL-->>API: UserDTO {id, firstName, lastName, email}
+    API-->>User: 201 Created {user info}
+

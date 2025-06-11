@@ -1,0 +1,55 @@
+classDiagram
+    class User {
+        +UUID id
+        +String firstName
+        +String lastName
+        +String email
+        +String passwordHash
+        +Boolean isAdmin
+        +Date createdAt
+        +Date updatedAt
+        +create()
+        +updateProfile()
+        +deleteAccount()
+    }
+    class Place {
+        +UUID id
+        +String title
+        +String description
+        +Decimal pricePerNight
+        +Float latitude
+        +Float longitude
+        +Date createdAt
+        +Date updatedAt
+        +create()
+        +updateDetails()
+        +deleteListing()
+    }
+    class Review {
+        +UUID id
+        +Integer rating
+        +String comment
+        +Date createdAt
+        +Date updatedAt
+        +create()
+        +updateComment()
+        +deleteReview()
+    }
+    class Amenity {
+        +UUID id
+        +String name
+        +String description
+        +Date createdAt
+        +Date updatedAt
+        +create()
+        +updateDetails()
+        +deleteAmenity()
+    }
+
+    User "1" -- "0..*" Place       : owns
+    User "1" -- "0..*" Review      : writes
+    Place "1" -- "0..*" Review     : hasReviews
+    Place "1" -- "0..*" Amenity    : offersAmenities
+    Review "1" --> "1" Place       : forPlace
+    Review "1" --> "1" User        : byUser
+
