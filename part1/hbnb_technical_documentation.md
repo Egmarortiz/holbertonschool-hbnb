@@ -1,7 +1,5 @@
 # HBnB Evolution: Technical Documentation
 
-# HBnB Evolution: Technical Documentation
-
 ## Introduction
 
 The HBnB Evolution application is a simplified AirBnB‑style platform enabling users to register, list properties, leave reviews, and manage amenities. This document consolidates the architectural and design artifacts needed to guide development, including:
@@ -216,5 +214,5 @@ sequenceDiagram
 
 ## Conclusion
 
-This document unifies the architectural vision and detailed design of HBnB Evolution, from high‑level layering to low‑level interactions. It will serve as the definitive reference during implementation, ensuring consistency, clarity, and adherence to core design principles. Feel free to iterate on these diagrams and notes as the project evolves.
+This document unifies the architectural vision and detailed design of HBnB Evolution, from high‑level layering to low‑level interactions. It will serve as the definitive reference during implementation, ensuring consistency, clarity, and adherence to core design principles.
 
