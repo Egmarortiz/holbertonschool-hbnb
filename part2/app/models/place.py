@@ -23,9 +23,9 @@ class Place(BaseModel):
         if amenity not in self.amenities:
             self.amenities.append(amenity)
 
-     def validate(self):
-         if not self.name.strip():
-             raise ValueError("Title cannot be empty")
+    def validate(self):
+        if not self.name.strip():
+            raise ValueError("Title cannot be empty")
         if not isinstance(self.price, (int, float)) or self.price <= 0:
             raise ValueError("Price must be a positive number")
         if not isinstance(self.latitude, (int, float)) or not (-90 <= self.latitude <= 90):

@@ -8,7 +8,7 @@ class Review(BaseModel):
         self.place = place  # ref place being reviewed
         self.rating = rating
         self.comment = comment
-         self.validate()
+        self.validate()
 
     def validate(self):
         if not self.comment.strip():

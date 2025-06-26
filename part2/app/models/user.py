@@ -9,7 +9,7 @@ class User(BaseModel):
         self.email = email
         self.password = password
         self.places = []
-         self.validate()
+        self.validate()
 
     def validate(self):
         if not self.first_name.strip():
