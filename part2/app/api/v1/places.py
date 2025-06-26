@@ -84,10 +84,7 @@ class PlaceList(Resource):
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
-        """Retrieve a list of all places"""
-        # Placeholder for logic to return a list of all places
         pass
-
 
 @api.route('/<place_id>')
 class PlaceResource(Resource):

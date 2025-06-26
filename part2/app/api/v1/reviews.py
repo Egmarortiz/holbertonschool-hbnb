@@ -21,7 +21,7 @@ class ReviewList(Resource):
     def post(self):
         """Register a new review"""
         review_data = api.payload
-
+        
         try:
             new_review = facade.create_review(review_data)
             return {
@@ -64,7 +64,7 @@ class ReviewResource(Resource):
         review = facade.get_review(review_id)
         if not review:
             return {'error': 'Review not found'}, 404
-
+        
         return {
             'id': review.id,
             'text': review.comment,
@@ -82,12 +82,12 @@ class ReviewResource(Resource):
     def put(self, review_id):
         """Update a review's information"""
         review_data = api.payload
-
+        
         try:
             updated_review = facade.update_review(review_id, review_data)
             if not updated_review:
                 return {'error': 'Review not found'}, 404
-
+            
             return {
                 'id': updated_review.id,
                 'text': updated_review.comment,

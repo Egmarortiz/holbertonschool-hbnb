@@ -8,3 +8,8 @@ class Review(BaseModel):
         self.place = place  # ref place being reviewed
         self.rating = rating
         self.comment = comment
+         self.validate()
+
+    def validate(self):
+        if not self.comment.strip():
+            raise ValueError("Review text cannot be empty")

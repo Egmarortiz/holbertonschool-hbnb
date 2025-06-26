@@ -10,7 +10,7 @@ user_model = api.model('User', {
     'last_name': fields.String(required=True,
                                description='Last name of the user'),
     'email': fields.String(required=True, description='Email of the user')
-})
+    })
 
 
 @api.route('/')
@@ -27,19 +27,31 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
-    def post(self):
-        """Register a new user"""
-        user_data = api.payload
-
-        # Simulate email uniqueness check (to be replaced by real
+    def post(self): try:
+        new_user = facade.create_user(user_data)
+            return {
+                    'id': new_user.id,
+                    'first_name': new_user.first_name,
+                    'last_name': new_user.last_name,
+                    'email': new_user.email
+                    }, 201
+        except ValueError as e:
+            return {'error': str(e)}, 400        # Simulate email uniqueness check (to be replaced by real
         # validation with persistence)
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
+        try:
+            new_user = facade.create_user(user_data)
+            return {
+                    'id': new_user.id,
+                    'first_name': new_user.first_name,
+                    'last_name': new_user.last_name,
+                    'email': new_user.email
+                    }, 201
+        except ValueError as e:
+            return {'error': str(e)}, 400
 
-        new_user = facade.create_user(user_data)
-        return {'id': new_user.id, 'first_name': new_user.first_name,
-                'last_name': new_user.last_name, 'email': new_user.email}, 201
 
 
 @api.route('/<user_id>')
@@ -61,21 +73,24 @@ class UserResource(Resource):
     def put(self, user_id):
         """Update a user's information"""
         user_data = api.payload
-        
+
         # Check if user exists
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
-        
+
         # Check if email is being changed and if new email is already taken
         if 'email' in user_data and user_data['email'] != user.email:
             existing_user = facade.get_user_by_email(user_data['email'])
             if existing_user:
                 return {'error': 'Email already registered'}, 400
-        
+
         # Update the user
         updated_user = facade.update_user(user_id, user_data)
-        return {'id': updated_user.id,
+        return {
+                'id': updated_user.id,
                 'first_name': updated_user.first_name,
                 'last_name': updated_user.last_name,
-                'email': updated_user.email}, 200yload)
+                'email': updated_user.email
+                }, 200
+
