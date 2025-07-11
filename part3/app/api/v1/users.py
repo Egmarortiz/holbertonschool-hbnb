@@ -34,6 +34,7 @@ class UserList(Resource):
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
+
         try:
             new_user = facade.create_user(user_data)
             return {
@@ -41,6 +42,7 @@ class UserList(Resource):
                     'first_name': new_user.first_name,
                     'last_name': new_user.last_name,
                     'email': new_user.email
+                    'password': new_user.password,
                     }, 201
         except ValueError as e:
             return {'error': str(e)}, 400
