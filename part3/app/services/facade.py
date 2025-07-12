@@ -22,7 +22,8 @@ class HBnBFacade:
         user = User(
             first_name=user_data.get('first_name', ''),
             last_name=user_data.get('last_name', ''),
-            email=user_data.get('email', '')
+            email=user_data.get('email', ''),
+            is_admin=user_data.get('is_admin', False)
         )
 
         user.hash_password(password)
