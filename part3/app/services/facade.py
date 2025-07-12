@@ -14,7 +14,18 @@ class HBnBFacade:
 
     def create_user(self, user_data):
         """Create new usr and store in the repo."""
-        user = User(**user_data)
+        password = user_data.get('password')
+
+        if not password:
+            raise ValueError("Password cannot be empty")
+
+        user = User(
+            first_name=user_data.get('first_name', ''),
+            last_name=user_data.get('last_name', ''),
+            email=user_data.get('email', '')
+        )
+
+        user.hash_password(password)
         self.user_repo.add(user)
         return user
 
@@ -38,6 +49,9 @@ class HBnBFacade:
         """Update a user's information."""
         user = self.user_repo.get(user_id)
         if user:
+            data = user_data.copy()
+            if 'password' in data and data['password']:
+                user.hash_password(data.pop('password'))
             self.user_repo.update(user_id, user_data)
             return user
         return None
