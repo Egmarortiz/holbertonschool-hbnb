@@ -1,6 +1,12 @@
 from app import db
 from .base_model import BaseModel
 
+# Association table to link places and amenities
+place_amenities = db.Table(
+    'place_amenities',
+    db.Column('place_id', db.String(36), db.ForeignKey('places.id'), primary_key=True),
+    db.Column('amenity_id', db.String(36), db.ForeignKey('amenities.id'), primary_key=True)
+)
 
 class Place(BaseModel):
 
@@ -15,6 +21,17 @@ class Place(BaseModel):
     longitude = db.Column(db.Float, nullable=False)
     owner_id = db.Column(db.String(36), db.ForeignKey('users.id'))
     owner = db.relationship('User', backref='places')
+    amenities = db.relationship(
+        'Amenity',
+        secondary=place_amenities,
+        backref='places',
+        lazy='subquery'
+    )
+    reviews = db.relationship(
+        'Review',
+        backref='place',
+        cascade='all, delete-orphan'
+    )
 
     def __init__(self, name="", description="", price=0, latitude=0.0,
                  longitude=0.0, owner=None, **kwargs):
@@ -25,9 +42,6 @@ class Place(BaseModel):
         self.latitude = latitude
         self.longitude = longitude
         self.owner = owner
-        # Relationships will be mapped in later tasks
-        self.reviews = []
-        self.amenities = []
         self.validate()
 
     def add_reviews(self, review):
@@ -35,7 +49,7 @@ class Place(BaseModel):
             self.reviews.append(review)
 
     def add_amenity(self, amenity):
-        if amenity not in self.amenities:
+        if amenity and amenity not in self.amenities:
             self.amenities.append(amenity)
 
     def validate(self):

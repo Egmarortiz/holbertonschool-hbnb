@@ -9,11 +9,16 @@ class Review(BaseModel):
 
     text = db.Column("comment", db.String(1024), nullable=False)
     rating = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'))
+    place_id = db.Column(db.String(36), db.ForeignKey('places.id'))
+    user = db.relationship('User', backref='reviews')
+    place = db.relationship('Place', backref='reviews')
 
     def __init__(self, user=None, place=None, rating=0, comment="", **kwargs):
         super().__init__(**kwargs)
-        self.user = user  # reference to the user who wrote the review
-        self.place = place  # reference to the place being reviewed        self.rating = rating
+        self.user = user
+        self.place = place
+        self.rating = rating
         self.text = comment
         self.validate()
 
