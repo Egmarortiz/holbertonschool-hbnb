@@ -3,12 +3,13 @@ from app.models.user import User
 from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.review import Review
+from app.services.repositories.user_repository import UserRepository
 
 
 class HBnBFacade:
     def __init__(self):
         """Initialize repositories using SQLAlchemy."""
-        self.user_repo = SQLAlchemyRepository(User)
+        self.user_repo = UserRepository()
         self.place_repo = SQLAlchemyRepository(Place)
         self.review_repo = SQLAlchemyRepository(Review)
         self.amenity_repo = SQLAlchemyRepository(Amenity)
@@ -37,11 +38,7 @@ class HBnBFacade:
 
     def get_user_by_email(self, email):
         """Find usr by email."""
-        users = self.user_repo.get_all()
-        for user in users:
-            if user.email == email:
-                return user
-        return None
+        return self.user_repo.get_user_by_email(email)
 
     def get_all_users(self):
         """Retrieve all users."""
