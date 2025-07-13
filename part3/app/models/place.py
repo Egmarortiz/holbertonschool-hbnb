@@ -29,7 +29,7 @@ class Place(BaseModel):
     )
     reviews = db.relationship(
         'Review',
-        backref='place',
+        back_populates='place',
         cascade='all, delete-orphan'
     )
 

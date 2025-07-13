@@ -12,7 +12,7 @@ class Review(BaseModel):
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'))
     place_id = db.Column(db.String(36), db.ForeignKey('places.id'))
     user = db.relationship('User', backref='reviews')
-    place = db.relationship('Place', backref='reviews')
+    place = db.relationship('Place', back_populates='reviews')
 
     def __init__(self, user=None, place=None, rating=0, comment="", **kwargs):
         super().__init__(**kwargs)
