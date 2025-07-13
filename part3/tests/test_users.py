@@ -18,7 +18,7 @@ class TestUserEndpoints(unittest.TestCase):
             'first_name': 'Jane',
             'last_name': 'Doe',
             'email': 'jane.doe@example.com'
-        })
+            })
         self.assertEqual(response.status_code, 201)
         data = response.get_json()
         self.assertIn('id', data)
@@ -29,8 +29,30 @@ class TestUserEndpoints(unittest.TestCase):
             'first_name': '',
             'last_name': '',
             'email': 'invalid-email'
-        })
+            })
         self.assertEqual(response.status_code, 400)
+
+    def test_update_first_name(self):
+        # create user directly via facade
+        user = facade.create_user({
+            'first_name': 'Old',
+            'last_name': 'Name',
+            'email': 'old@example.com',
+            'password': 'pwd'
+            })
+        # authenticate to get a token
+        login_res = self.client.post('/api/v1/login',
+                                     json={'email': 'old@example.com',
+                                           'password': 'pwd'})
+        token = login_res.get_json()['access_token']
+        # update first name only
+        response = self.client.put(f'/api/v1/users/{user.id}',
+                                   headers={'Authorization': f'Bearer {token}'},
+                                   json={'first_name': 'New'})
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(data['first_name'], 'New')
+
 
 if __name__ == '__main__':
     unittest.main()

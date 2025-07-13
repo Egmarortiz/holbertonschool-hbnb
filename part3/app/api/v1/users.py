@@ -13,6 +13,12 @@ user_model = api.model('User', {
     'email': fields.String(required=True, description='Email of the user')
     })
 
+# Model used when updating an existing user. Only first and last name
+# are allowed to be modified through the API.
+user_update_model = api.model('UserUpdate', {
+    'first_name': fields.String(description='First name'),
+    'last_name': fields.String(description='Last name')
+    })
 
 @api.route('/')
 class UserList(Resource):
@@ -62,7 +68,7 @@ class UserResource(Resource):
         return {'id': user.id, 'first_name': user.first_name,
                 'last_name': user.last_name, 'email': user.email}, 200
 
-    @api.expect(user_model, validate=True)
+    @api.expect(user_update_model, validate=True)
     @api.response(200, 'User successfully updated')
     @api.response(404, 'User not found')
     @api.response(400, 'Invalid input data')
