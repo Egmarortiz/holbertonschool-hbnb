@@ -17,34 +17,39 @@ class TestPlaceEndpoints(unittest.TestCase):
         self.user = facade.create_user({
             'first_name': 'John',
             'last_name': 'Doe',
-            'email': 'john@example.com'
+            'email': 'john@example.com',
+            'password': 'pwd'
         })
         self.amenity = facade.create_amenity({'name': 'Wifi'})
 
+          # Authenticate user to get JWT
+        login_res = self.client.post('/api/v1/login', json={'email': 'john@example.com', 'password': 'pwd'})
+        self.token = login_res.get_json()['access_token']
+
     def test_create_place(self):
-        response = self.client.post('/api/v1/places/', json={
-            'title': 'Nice Place',
-            'description': 'Cozy',
-            'price': 100,
-            'latitude': 10.0,
-            'longitude': 20.0,
-            'owner_id': self.user.id,
-            'amenities': [self.amenity.id]
-        })
-        self.assertEqual(response.status_code, 201)
+        response = self.client.post('/api/v1/places/',
+                                    headers={'Authorization': f'Bearer {self.token}'},
+                                    json={
+                                        'title': 'Nice Place',
+                                        'description': 'Cozy',
+                                        'price': 100,
+                                        'latitude': 10.0,
+                                        'longitude': 20.0,
+                                        'amenities': [self.amenity.id]
+                                    })        self.assertEqual(response.status_code, 201)
         data = response.get_json()
         self.assertEqual(data['title'], 'Nice Place')
 
     def test_create_place_invalid_latitude(self):
-        response = self.client.post('/api/v1/places/', json={
-            'title': 'Bad Place',
-            'price': 50,
-            'latitude': 100.0,
-            'longitude': 0.0,
-            'owner_id': self.user.id,
-            'amenities': []
-        })
-        self.assertEqual(response.status_code, 400)
+         response = self.client.post('/api/v1/places/',
+                                    headers={'Authorization': f'Bearer {self.token}'},
+                                    json={
+                                        'title': 'Bad Place',
+                                        'price': 50,
+                                        'latitude': 100.0,
+                                        'longitude': 0.0,
+                                        'amenities': []
+                                    })        self.assertEqual(response.status_code, 400)
 
 if __name__ == '__main__':
     unittest.main()

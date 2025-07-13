@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services import facade
 
 api = Namespace('places', description='Place operations')
@@ -25,7 +26,7 @@ place_model = api.model('Place', {
                              description='Latitude of the place'),
     'longitude': fields.Float(required=True,
                               description='Longitude of the place'),
-    'owner_id': fields.String(required=True, description='ID of the owner'),
+    'owner_id': fields.String(description='ID of the owner'),
     'amenities': fields.List(fields.String, required=True,
                              description="List of amenities ID's")
 })
@@ -36,14 +37,18 @@ class PlaceList(Resource):
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
         """Register a new place"""
-        place_data = api.payload
+        place_data = api.payload or {}
+        current_user = get_jwt_identity()
+
+        # owner must be the authenticated user
+        place_data['owner_id'] = current_user['id'] if isinstance(current_user, dict) else current_user
 
         try:
-            # Validate required fields
-            required_fields = ['title', 'price', 'latitude', 'longitude',
-                               'owner_id']
+            # Validate required fields  (owner is derived from token)
+            required_fields = ['title', 'price', 'latitude', 'longitude']
             for field in required_fields:
                 if field not in place_data or place_data[field] is None:
                     return {'error': f'Missing required field: {field}'}, 400
@@ -123,15 +128,24 @@ class PlaceResource(Resource):
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
-        place_data = api.payload
+        place_data = api.payload or {}
+        current_user = get_jwt_identity()
 
         try:
-            # Check if place exists
+            # Check if place exists an ownership
             existing_place = facade.get_place(place_id)
             if not existing_place:
                 return {'error': 'Place not found'}, 404
+
+            if existing_place.owner.id != (current_user['id'] if isinstance(current_user, dict) else current_user):
+                return {'error': 'Unauthorized action'}, 403
+
+            # prevent changing owner through payload
+            if 'owner_id' in place_data:
+                del place_data['owner_id']
 
             # Validate data types and ranges if provided
             if 'price' in place_data:

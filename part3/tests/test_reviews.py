@@ -18,7 +18,8 @@ class TestReviewEndpoints(unittest.TestCase):
         self.user = facade.create_user({
             'first_name': 'Alice',
             'last_name': 'Smith',
-            'email': 'alice@example.com'
+            'email': 'alice@example.com',
+            'password': 'pwd'
         })
         self.place = facade.create_place({
             'title': 'House',
@@ -30,25 +31,28 @@ class TestReviewEndpoints(unittest.TestCase):
             'amenities': []
         })
 
+        login_res = self.client.post('/api/v1/login', json={'email': 'alice@example.com', 'password': 'pwd'})
+        self.token = login_res.get_json()['access_token']
+
     def test_create_review(self):
-        response = self.client.post('/api/v1/reviews/', json={
-            'text': 'Great',
-            'rating': 5,
-            'user_id': self.user.id,
-            'place_id': self.place.id
-        })
-        self.assertEqual(response.status_code, 201)
+        response = self.client.post('/api/v1/reviews/',
+                                    headers={'Authorization': f'Bearer {self.token}'},
+                                    json={
+                                        'text': 'Great',
+                                        'rating': 5,
+                                        'place_id': self.place.id
+                                    })        self.assertEqual(response.status_code, 201)
         data = response.get_json()
         self.assertEqual(data['rating'], 5)
 
     def test_create_review_empty_text(self):
-        response = self.client.post('/api/v1/reviews/', json={
-            'text': '',
-            'rating': 3,
-            'user_id': self.user.id,
-            'place_id': self.place.id
-        })
-        self.assertEqual(response.status_code, 400)
+         response = self.client.post('/api/v1/reviews/',
+                                    headers={'Authorization': f'Bearer {self.token}'},
+                                    json={
+                                        'text': '',
+                                        'rating': 3,
+                                        'place_id': self.place.id
+                                    })        self.assertEqual(response.status_code, 400)
 
 if __name__ == '__main__':
     unittest.main()
