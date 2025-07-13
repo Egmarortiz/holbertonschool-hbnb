@@ -18,6 +18,10 @@ def create_app(config_class=config.DevelopmentConfig):
     jwt.init_app(app)
     db.init_app(app)
 
+    # Ensure tables exist each time the app starts
+    with app.app_context():
+        db.create_all()
+
     from app.api.v1.users import api as users_ns
     from app.api.v1.auth import api as auth_ns
     from app.api.v1.amenities import api as amenities_ns

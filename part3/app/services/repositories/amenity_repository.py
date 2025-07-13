@@ -1,9 +1,9 @@
-from app.models.place import Place
+from app.models.amenity import Amenity
 from app.persistence.repository import SQLAlchemyRepository
 
 
-class PlaceRepository(SQLAlchemyRepository):
-    """Repository for ``Place`` objects."""
+class AmenityRepository(SQLAlchemyRepository):
+    """Repository for ``Amenity`` objects."""
 
     def __init__(self):
-        super().__init__(Place)
+        super().__init__(Amenity)

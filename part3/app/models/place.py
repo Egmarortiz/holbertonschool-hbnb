@@ -13,6 +13,8 @@ class Place(BaseModel):
     price = db.Column(db.Float, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
+    owner_id = db.Column(db.String(36), db.ForeignKey('users.id'))
+    owner = db.relationship('User', backref='places')
 
     def __init__(self, name="", description="", price=0, latitude=0.0,
                  longitude=0.0, owner=None, **kwargs):
