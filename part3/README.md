@@ -41,6 +41,13 @@ python run.py
 
 The API will listen on `http://127.0.0.1:5000`.
 
+### Default administrator
+
+`run.py` seeds a default admin account the first time it executes.  Set the
+`ADMIN_EMAIL` and `ADMIN_PASSWORD` environment variables to control the
+credentials, otherwise `admin@example.com`/`admin` are used.  Log in with these
+details to obtain a token for the admin-only endpoints.
+
 ## Running Tests
 
 Unit tests live in the `tests` directory and cover the user, place and review endpoints. Run them with:
