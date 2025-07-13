@@ -53,6 +53,7 @@ class InMemoryRepository(Repository):
         return next((obj for obj in self._storage.values()
                     if getattr(obj, attr_name) == attr_value), None)
 
+from app import db
 
 class SQLAlchemyRepository(Repository):
     """Repository implementation using SQLAlchemy for persistence."""
@@ -61,7 +62,6 @@ class SQLAlchemyRepository(Repository):
         self.model = model
 
     def add(self, obj):
-        from app import db
         db.session.add(obj)
         db.session.commit()
 
@@ -72,24 +72,17 @@ class SQLAlchemyRepository(Repository):
         return self.model.query.all()
 
     def update(self, obj_id, data):
-        from app import db
         obj = self.get(obj_id)
         if obj:
             for key, value in data.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
+                setattr(obj, key, value)
             db.session.commit()
 
     def delete(self, obj_id):
-        from app import db
         obj = self.get(obj_id)
         if obj:
             db.session.delete(obj)
             db.session.commit()
 
     def get_by_attribute(self, attr_name, attr_value):
-        return (
-            self.model.query.filter(
-                getattr(self.model, attr_name) == attr_value
-            ).first()
-        )
+        return self.model.query.filter_by(**{attr_name: attr_value}).first()
