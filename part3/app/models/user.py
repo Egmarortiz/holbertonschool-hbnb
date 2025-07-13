@@ -1,6 +1,5 @@
 from app import db, bcrypt
 from .base_model import BaseModel
-from app import bcrypt
 
 
 class User(BaseModel):
@@ -12,7 +11,11 @@ class User(BaseModel):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(128), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
-    places = db.relationship('Place', backref='owner', cascade='all, delete-orphan')
+    places = db.relationship(
+        'Place',
+        back_populates='owner',
+        cascade='all, delete-orphan'
+    )
 
     def __init__(self, first_name="", last_name="", email="", password="", is_admin=False, **kwargs):
         super().__init__(**kwargs)
