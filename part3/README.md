@@ -57,3 +57,8 @@ python -m unittest discover -s tests
 
 ## Conclusion
 Part 2 serves as a proof of concept for a clean architecture approach while remaining small enough to not overwhelm beginner devs.
+
+## Administrator Endpoints
+
+A JWT token contains an `is_admin` claim. Endpoints that create or update users and amenities require this flag to be true. Administrators can also modify or delete any place or review, bypassing the normal ownership checks.
+

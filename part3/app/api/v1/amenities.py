@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
+from flask_jwt_extended import jwt_required, get_jwt
 from app.services import facade
 
 api = Namespace('amenities', description='Amenity operations')
@@ -15,8 +16,13 @@ class AmenityList(Resource):
     @api.expect(amenity_model)
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
-        """Register a new amenity"""
+        """Register a new amenity (Admin Only)"""
+        claims = get_jwt()
+        if not claims.get('is_admin', False):
+            return {'error': 'Admin privileges required'}, 403
+
         amenity_data = api.payload
 
         # Validate required fields
@@ -81,7 +87,25 @@ class AmenityResource(Resource):
     @api.response(200, 'Amenity updated successfully')
     @api.response(404, 'Amenity not found')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def put(self, amenity_id):
-        """Update an amenity's information"""
-        # Placeholder for the logic to update an amenity by ID
-        pass
+        """Update an amenity's information (admin only)"""
+        claims = get_jwt()
+        if not claims.get('is_admin', False):
+            return {'error': 'Admin privileges required'}, 403
+
+        amenity_data = api.payload or {}
+        amenity = facade.get_amenity(amenity_id)
+        if not amenity:
+            return {'error': 'Amenity not found'}, 404
+
+        if 'name' in amenity_data and not amenity_data['name'].strip():
+            return {'error': 'Name cannot be empty'}, 400
+
+        updated = facade.update_amenity(amenity_id, amenity_data)
+        return {
+            'id': updated.id,
+            'name': updated.name,
+            'created_at': updated.created_at.isoformat(),
+            'updated_at': updated.updated_at.isoformat()
+        }, 200

@@ -72,8 +72,13 @@ class HBnBFacade:
         return self.amenity_repo.get_all()
 
     def update_amenity(self, amenity_id, amenity_data):
-        # Placeholder for logic to update an amenity
-        pass
+        amenity = self.amenity_repo.get(amenity_id)
+        if not amenity:
+            return None
+        if 'name' in amenity_data:
+            amenity.name = amenity_data['name']
+        amenity.save()
+        return amenity
 
     def create_place(self, place_data):
         """Create a new place and store in the repository."""

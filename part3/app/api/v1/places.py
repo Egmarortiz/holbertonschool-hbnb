@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.services import facade
 
 api = Namespace('places', description='Place operations')
@@ -133,6 +133,8 @@ class PlaceResource(Resource):
         """Update a place's information"""
         place_data = api.payload or {}
         current_user = get_jwt_identity()
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
 
         try:
             # Check if place exists an ownership
@@ -140,7 +142,7 @@ class PlaceResource(Resource):
             if not existing_place:
                 return {'error': 'Place not found'}, 404
 
-            if existing_place.owner.id != (current_user['id'] if isinstance(current_user, dict) else current_user):
+            if not is_admin and existing_place.owner.id != (current_user['id'] if isinstance(current_user, dict) else current_user):
                 return {'error': 'Unauthorized action'}, 403
 
             # prevent changing owner through payload
