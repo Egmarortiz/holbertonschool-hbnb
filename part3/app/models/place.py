@@ -1,16 +1,29 @@
+from app import db
 from .base_model import BaseModel
 
 
 class Place(BaseModel):
+
+    """SQLAlchemy model for places."""
+
+    __tablename__ = "places"
+
+    name = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.String(1024))
+    price = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+
     def __init__(self, name="", description="", price=0, latitude=0.0,
-                 longitude=0.0, owner=None):
-        super().__init__()
+                 longitude=0.0, owner=None, **kwargs):
+        super().__init__(**kwargs)
         self.name = name
         self.description = description
         self.price = price
         self.latitude = latitude
         self.longitude = longitude
         self.owner = owner
+        # Relationships will be mapped in later tasks
         self.reviews = []
         self.amenities = []
         self.validate()

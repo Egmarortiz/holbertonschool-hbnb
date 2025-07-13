@@ -1,18 +1,21 @@
-from app.persistence.repository import SQLAlchemyRepository
 from app.models.user import User
 from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.review import Review
-from app.services.repositories.user_repository import UserRepository
-
+from app.services.repositories import (
+        UserRepository,
+        AmenityRepository,
+        PlaceRepository,
+        ReviewRepository,
+        )
 
 class HBnBFacade:
     def __init__(self):
         """Initialize repositories using SQLAlchemy."""
         self.user_repo = UserRepository()
-        self.place_repo = SQLAlchemyRepository(Place)
-        self.review_repo = SQLAlchemyRepository(Review)
-        self.amenity_repo = SQLAlchemyRepository(Amenity)
+        self.place_repo = PlaceRepository()
+        self.review_repo = ReviewRepository()
+        self.amenity_repo = AmenityRepository()
 
     def create_user(self, user_data):
         """Create new usr and store in the repo."""
@@ -22,11 +25,11 @@ class HBnBFacade:
             raise ValueError("Password cannot be empty")
 
         user = User(
-            first_name=user_data.get('first_name', ''),
-            last_name=user_data.get('last_name', ''),
-            email=user_data.get('email', ''),
-            is_admin=user_data.get('is_admin', False)
-        )
+                first_name=user_data.get('first_name', ''),
+                last_name=user_data.get('last_name', ''),
+                email=user_data.get('email', ''),
+                is_admin=user_data.get('is_admin', False)
+                )
 
         user.hash_password(password)
         self.user_repo.add(user)
@@ -93,13 +96,13 @@ class HBnBFacade:
             amenities.append(amenity)
         # Create place with name instead of title to match model
         place = Place(
-            name=place_data['title'],  # Map title to name
-            description=place_data.get('description', ''),
-            price=place_data['price'],
-            latitude=place_data['latitude'],
-            longitude=place_data['longitude'],
-            owner=owner
-        )
+                name=place_data['title'],  # Map title to name
+                description=place_data.get('description', ''),
+                price=place_data['price'],
+                latitude=place_data['latitude'],
+                longitude=place_data['longitude'],
+                owner=owner
+                )
         # Add amenities
         for amenity in amenities:
             place.add_amenity(amenity)
@@ -168,11 +171,11 @@ class HBnBFacade:
 
         # Create review (map 'text' to 'comment' to match model)
         review = Review(
-            user=user,
-            place=place,
-            rating=rating,
-            comment=review_data.get('text', '')
-        )
+                user=user,
+                place=place,
+                rating=rating,
+                comment=review_data.get('text', '')
+                )
 
         self.review_repo.add(review)
         return review
