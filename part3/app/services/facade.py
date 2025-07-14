@@ -219,9 +219,9 @@ class HBnBFacade:
                 raise ValueError("Rating must be an integer between 1 and 5")
             review.rating = rating
 
-        # Update text/comment if provided
+        # Update text if provided
         if 'text' in review_data:
-            review.comment = review_data['text']
+            review.text = review_data['text']
 
         # Save changes (updates the updated_at timestamp)
         review.save()

@@ -40,7 +40,7 @@ class ReviewList(Resource):
             new_review = facade.create_review(review_data)
             return {
                 'id': new_review.id,
-                'text': new_review.comment,
+                'text': new_review.text,
                 'rating': new_review.rating,
                 'user_id': new_review.user.id,
                 'place_id': new_review.place.id,
@@ -59,7 +59,7 @@ class ReviewList(Resource):
         return [
             {
                 'id': review.id,
-                'text': review.comment,
+                'text': review.text,
                 'rating': review.rating,
                 'user_id': review.user.id,
                 'place_id': review.place.id,
@@ -81,7 +81,7 @@ class ReviewResource(Resource):
 
         return {
             'id': review.id,
-            'text': review.comment,
+            'text': review.text,
             'rating': review.rating,
             'user_id': review.user.id,
             'place_id': review.place.id,
@@ -119,7 +119,7 @@ class ReviewResource(Resource):
 
             return {
                 'id': updated_review.id,
-                'text': updated_review.comment,
+                'text': updated_review.text,
                 'rating': updated_review.rating,
                 'user_id': updated_review.user.id,
                 'place_id': updated_review.place.id,
