@@ -1,71 +1,90 @@
-# HBnB Evolution API (Part 2)
+# HBnB Evolution API (Part 3)
 
-HBnB Evolution is a lightweight Flask REST API modeling a simplified AirBnB-like application. This folder contains the second phase of the project where the API layer, business logic and a minimal in-memory persistence layer are implemented.
+HBnB Evolution continues the gradual design of a small AirBnB clone. Part 3 replaces the in-memory storage used in previous versions with a proper relational database powered by SQLAlchemy. The goal is to keep the code simple while demonstrating how to structure a Flask project with clear separation between the API, business logic and persistence layers.
 
-## Architecture
+## Project Structure
 
-The code follows a layered design inspired by clean architecture principles:
+```
+part3/
+├── app/                # Flask application package
+│   ├── api/            # Flask‑RESTX namespaces
+│   ├── models/         # SQLAlchemy models (User, Place, Amenity, Review)
+│   ├── persistence/    # Repository implementations
+│   └── services/       # High level facade used by the API
+├── sql/                # SQL schema and seed data
+├── config.py           # Application configuration classes
+├── run.py              # Entry point to launch the API
+└── tests/              # Unit tests for the endpoints
+```
 
-- **Presentation layer**: Flask-RESTX namespaces define the HTTP endpoints under `app/api/v1`. They validate incoming requests and marshal responses.
-- **Business logic layer**: `app/services/facade.py` centralizes operations for users, places, amenities and reviews. Each method performs validation before delegating to the repositories.
-- **Persistence layer**: `app/persistence/repository.py` provides an in-memory repository used by the facade. It can be swapped out for a real database in the future.
-- **Domain models**: Located in `app/models`, these classes (`User`, `Place`, `Amenity`, `Review`) extend `BaseModel` and include basic validation logic.
+### Key Components
 
-The application is initialized in `app/__init__.py` where the API namespaces are registered. `run.py` simply creates the app and starts the development server.
+- **Flask‑RESTX** provides the REST interface and automatically documents the API.
+- **SQLAlchemy** handles database interactions. By default the app uses a SQLite database created in `development.db`.
+- **JWT Authentication** is used for login and for protecting certain routes. A default administrator account is seeded when the app first runs.
+- **Repository Pattern** abstracts persistence. `SQLAlchemyRepository` writes to the database while `InMemoryRepository` is kept for testing purposes.
 
-## Endpoints
+## Database Schema
+All tables are defined in `sql/create_tables.sql`. The script creates the following tables with relationships:
+- `users` – account information and admin flag
+- `places` – lodging entries owned by a user
+- `amenities` – available amenities
+- `reviews` – user reviews of places
+- `place_amenities` – many‑to‑many join table
 
-The API exposes CRUD-style routes for each entity. Examples:
+The schema can be visualized using the ER diagram in `sql/er-diagram.mmd`. To seed the database with an administrator and some sample amenities, run `sql/initial_data.sql`.
 
-- `POST /api/v1/users/` – create a new user
-- `POST /api/v1/places/` – create a place owned by a user
-- `POST /api/v1/reviews/` – attach a review to a place
+```
+sqlite3 development.db < sql/create_tables.sql
+sqlite3 development.db < sql/initial_data.sql
+```
 
-Each namespace also supports retrieving and updating individual resources. Swagger documentation is automatically generated and available at `/api/v1/` when the server is running.
+## Running the Application
 
-## Setup
-
-1. Create a virtual environment and install dependencies:
+1. **Install dependencies**
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+   python3 -m venv env
+   source env/bin/activate
+   pip install -r requirements.txt
+   ```
 
 2. Start the server:
 
 ```bash
-python run.py
-```
+   python run.py
+   ```
 
-The API will listen on `http://127.0.0.1:5000`.
+The API will be available at `http://127.0.0.1:5000` and the Swagger UI is served at `/api/v1/
 
-### Default administrator
+Environment variables `ADMIN_EMAIL` and `ADMIN_PASSWORD` may be used to customize the credentials of the initial administrator.
 
-`run.py` seeds a default admin account the first time it executes.  Set the
-`ADMIN_EMAIL` and `ADMIN_PASSWORD` environment variables to control the
-credentials, otherwise `admin@example.com`/`admin` are used.  Log in with these
-details to obtain a token for the admin-only endpoints.
+## Example Endpoints
+
+- `POST /api/v1/login` – obtain a JWT token
+- `POST /api/v1/users/` – register a user
+- `GET  /api/v1/places/` – list all places
+- `POST /api/v1/places/` – create a place (authentication required)
+- `POST /api/v1/reviews/` – add a review for a place
+
+Every entity also supports retrieving, updating and deleting specific records. Endpoints that modify users or amenities require an administrator token.
 
 ## Running Tests
 
-Unit tests live in the `tests` directory and cover the user, place and review endpoints. Run them with:
+Unit tests are located in the `tests` directory. They use the in‑memory repositories to keep the suite fast and independent of the database.
 
 ```bash
 python -m unittest discover -s tests
 ```
 
-## Design Notes
+## Notes on Design
 
-- **Validation** – Models enforce simple constraints (e.g. user fields cannot be empty, latitude/longitude ranges). The facade raises `ValueError` when validation fails so the API can return a `400 Bad Request`.
-- **In-memory storage** – Repositories keep objects in dictionaries. This makes the service self-contained and easy to test without a database.
-- **Facade pattern** – The API only interacts with the `HBnBFacade` which orchestrates persistence and validation. This keeps the controllers thin and makes the codebase easier to evolve.
+- **Validation** is performed in the model constructors and in the facade to keep the API layer thin.
+- **Facade Pattern** – `app/services/facade.py` is the single entry point used by the routes. It coordinates repositories and applies business rules.
+- **Swappable Storage** – Although the app ships with a SQLAlchemy backend, the repository pattern makes it trivial to replace it with another data store if desired.
 
-## Conclusion
-Part 2 serves as a proof of concept for a clean architecture approach while remaining small enough to not overwhelm beginner devs.
+## Additional Resources
+The `sql/` folder contains a more detailed walkthrough of the database setup along with instructions for verifying the schema using the SQLite CLI. Consult `sql/README.md` for more information.
 
-## Administrator Endpoints
-
-A JWT token contains an `is_admin` claim. Endpoints that create or update users and amenities require this flag to be true. Administrators can also modify or delete any place or review, bypassing the normal ownership checks.
-
+---
+This marks the third milestone of the HBnB project, demonstrating how to persist the application's data in a real database while maintaining a clean and testable architecture.
