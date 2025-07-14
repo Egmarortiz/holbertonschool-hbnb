@@ -7,6 +7,53 @@ This folder contains SQL files for generating the database schema used in the HB
 
 These scripts are written for SQLite but avoid engine-specific syntax so they can be adapted to other relational databases.
 
+## ER Diagram
+
+The schema defined in `create_tables.sql` is summarized below.
+
+```mermaid
+erDiagram
+    users {
+        CHAR(36) id PK
+        VARCHAR first_name
+        VARCHAR last_name
+        VARCHAR email
+        VARCHAR password
+        BOOLEAN is_admin
+    }
+    places {
+        CHAR(36) id PK
+        VARCHAR title
+        TEXT description
+        DECIMAL price
+        FLOAT latitude
+        FLOAT longitude
+        CHAR(36) owner_id FK
+    }
+    reviews {
+        CHAR(36) id PK
+        TEXT text
+        INTEGER rating
+        CHAR(36) user_id FK
+        CHAR(36) place_id FK
+    }
+    amenities {
+        CHAR(36) id PK
+        VARCHAR name
+    }
+    place_amenities {
+        CHAR(36) place_id PK FK
+        CHAR(36) amenity_id PK FK
+    }
+
+    users ||--o{ places : owns
+    users ||--o{ reviews : writes
+    places ||--o{ reviews : receives
+    places ||--o{ place_amenities : has
+    amenities ||--o{ place_amenities : listed_in
+
+```
+
 ## Running the Scripts
 
 ```
