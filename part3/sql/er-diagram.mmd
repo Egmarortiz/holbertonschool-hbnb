@@ -28,8 +28,8 @@ erDiagram
         VARCHAR name
     }
     place_amenities {
-        CHAR(36) place_id PK FK
-        CHAR(36) amenity_id PK FK
+        CHAR(36) place_id PK
+        CHAR(36) amenity_id PK
     }
 
     users ||--o{ places : owns
