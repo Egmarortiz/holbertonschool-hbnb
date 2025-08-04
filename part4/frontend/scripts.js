@@ -45,6 +45,23 @@ function isLoggedIn() {
   return !!getCookie('token');
 }
 
+async function loginUser(email, password) {
+  const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email, password })
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error || response.statusText);
+  }
+
+  return response.json();
+}
+
 function updateLoginButton() {
   const btn = document.querySelector('.login-button');
   if (!btn) return;
@@ -97,24 +114,6 @@ function renderPlaceDetails() {
       '<p><strong>' + r.user + '</strong> - Rating: ' + r.rating + '</p>';
     reviewsSection.appendChild(card);
   });
-
-async function loginUser(email, password) {
-  const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ email, password })
-  });
-
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error || response.statusText);
-  }
-
-  return response.json();
-}
-
 
   const addReview = document.getElementById('add-review-section');
   if (isLoggedIn()) {
