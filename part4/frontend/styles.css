@@ -73,6 +73,12 @@ main {
     background-color: #fff;
 }
 
+
+.error {
+    color: red;
+    margin-top: 10px;
+}
+
 .place-details {
     margin: 20px;
 }

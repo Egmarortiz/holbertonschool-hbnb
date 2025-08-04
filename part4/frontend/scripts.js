@@ -22,8 +22,27 @@ const samplePlaces = [
   }
 ];
 
+
+function setCookie(name, value, days) {
+  let expires = '';
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    expires = '; expires=' + date.toUTCString();
+  }
+  document.cookie = name + '=' + (value || '') + expires + '; path=/';
+}
+
+function getCookie(name) {
+  return document.cookie.split('; ').find(row => row.startsWith(name + '='))?.split('=')[1];
+}
+
+function eraseCookie(name) {
+  document.cookie = name + '=; Max-Age=0; path=/';
+}
+
 function isLoggedIn() {
-  return localStorage.getItem('loggedIn') === 'true';
+  return !!getCookie('token');
 }
 
 function updateLoginButton() {
@@ -34,7 +53,7 @@ function updateLoginButton() {
     btn.href = '#';
     btn.addEventListener('click', function (e) {
       e.preventDefault();
-      localStorage.removeItem('loggedIn');
+      eraseCookie('token');
       window.location.href = 'index.html';
     });
   } else {
@@ -90,10 +109,29 @@ function renderPlaceDetails() {
 function handleLoginForm() {
   const form = document.getElementById('login-form');
   if (!form) return;
-  form.addEventListener('submit', function (e) {
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
-    localStorage.setItem('loggedIn', 'true');
-    window.location.href = 'index.html';
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorEl = document.getElementById('login-error');
+    if (errorEl) errorEl.textContent = '';
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setCookie('token', data.access_token, 1);
+        window.location.href = 'index.html';
+      } else {
+        const err = await response.json();
+        if (errorEl) errorEl.textContent = err.error || 'Login failed';
+      }
+    } catch (err) {
+      if (errorEl) errorEl.textContent = 'Login failed';
+    }
   });
 }
 
