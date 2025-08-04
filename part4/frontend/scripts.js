@@ -98,6 +98,24 @@ function renderPlaceDetails() {
     reviewsSection.appendChild(card);
   });
 
+async function loginUser(email, password) {
+  const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email, password })
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error || response.statusText);
+  }
+
+  return response.json();
+}
+
+
   const addReview = document.getElementById('add-review-section');
   if (isLoggedIn()) {
     addReview.innerHTML = '<a href="add_review.html?id=' + place.id + '" class="add-review">Add Review</a>';
@@ -109,28 +127,19 @@ function renderPlaceDetails() {
 function handleLoginForm() {
   const form = document.getElementById('login-form');
   if (!form) return;
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const errorEl = document.getElementById('login-error');
     if (errorEl) errorEl.textContent = '';
+
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setCookie('token', data.access_token, 1);
-        window.location.href = 'index.html';
-      } else {
-        const err = await response.json();
-        if (errorEl) errorEl.textContent = err.error || 'Login failed';
-      }
-    } catch (err) {
-      if (errorEl) errorEl.textContent = 'Login failed';
+      const data = await loginUser(email, password);
+      setCookie('token', data.access_token, 1);
+      window.location.href = 'index.html';
+    } catch (error) {
+      if (errorEl) errorEl.textContent = error.message || 'Login failed';
     }
   });
 }
