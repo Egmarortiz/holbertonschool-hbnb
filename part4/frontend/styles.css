@@ -103,6 +103,46 @@ button:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+.place-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.place-layout .place-details {
+    flex: 1;
+}
+
+.reviews-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#reviews {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#add-review-section {
+    margin-top: 20px;
+}
+
+#add-review-section textarea,
+#add-review-section select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+#add-review-section button {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .form {
     margin: 20px;
     padding: 10px;
@@ -131,5 +171,8 @@ footer {
 @media (max-width: 768px) {
     .places-grid {
         grid-template-columns: 1fr;
+    }
+    .place-layout {
+        flex-direction: column;
     }
 }
