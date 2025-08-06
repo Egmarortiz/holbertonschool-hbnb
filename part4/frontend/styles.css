@@ -15,8 +15,12 @@
 body {
     background-color: #f7f7f7;
     color: #333;
+}
+
+.container {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 1rem;
 }
 
 header {
@@ -74,9 +78,10 @@ button:hover {
     background-color: #e04e52;
 }
 
-#places-list {
+
+.places-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     padding: 20px;
 }
@@ -124,7 +129,7 @@ footer {
 }
 
 @media (max-width: 768px) {
-    #places-list {
+    .places-grid {
         grid-template-columns: 1fr;
     }
 }

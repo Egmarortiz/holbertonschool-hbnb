@@ -9,26 +9,33 @@
 </head>
 <body>
     <header>
-        <img src="images/logo.png" alt="HBnB logo" class="logo">
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="login.html" id="login-link" class="login-button">Login</a>
-            <a href="#" id="logout-link" class="logout-button">Logout</a>
-        </nav>
+        <div class="container">
+            <img src="images/logo.png" alt="HBnB logo" class="logo">
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="login.html" id="login-link" class="login-button">Login</a>
+                <a href="#" id="logout-link" class="logout-button">Logout</a>
+            </nav>
+        </div>
     </header>
     <main>
-      <div class="filters">
-        <label for="price-filter">Max price:</label>
-        <select id="price-filter">
-          <option value="10">10</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-          <option value="all" selected>All</option>
-        </select>
+      <div class="container">
+        <section class="filters">
+          <label for="price-filter">Max price:</label>
+          <select id="price-filter">
+            <option value="10">10</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all" selected>All</option>
+          </select>
+        </section>
+        <section id="places-list" class="places-grid"></section>
       </div>
-      <section id="places-list"></section>
-    </main><footer>
-        <p>&copy; 2024 HBnB. All rights reserved.</p>
+    </main>
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 HBnB. All rights reserved.</p>
+        </div>
     </footer>
     <script src="scripts.js"></script>
 </body>
