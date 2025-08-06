@@ -138,13 +138,25 @@ function displayPlaces(places) {
     const item = document.createElement('div');
     item.className = 'place-card';
     item.dataset.price = place.price;
-    item.innerHTML = `
-      <h2>${place.title}</h2>
-      <p>${place.description || ''}</p>
-      <p>Location: ${place.latitude}, ${place.longitude}</p>
-      <p>Price: $${place.price}</p>
-      <a href="place.html?id=${place.id}" class="details-button">View Details</a>
-    `;
+
+    const titleEl = document.createElement('h2');
+    titleEl.textContent = place.title;
+
+    const descEl = document.createElement('p');
+    descEl.textContent = place.description || '';
+
+    const locEl = document.createElement('p');
+    locEl.textContent = `Location: ${place.latitude}, ${place.longitude}`;
+
+    const priceEl = document.createElement('p');
+    priceEl.textContent = `Price: $${place.price}`;
+
+    const detailsLink = document.createElement('a');
+    detailsLink.href = `place.html?id=${place.id}`;
+    detailsLink.className = 'details-button';
+    detailsLink.textContent = 'View Details';
+
+    item.append(titleEl, descEl, locEl, priceEl, detailsLink);
     list.appendChild(item);
   });
 }
@@ -193,7 +205,8 @@ async function fetchPlaceDetails(token, placeId) {
       const reviewsResp = await fetch('http://127.0.0.1:5000/api/v1/reviews/');
       if (reviewsResp.ok) {
         const reviewsData = await reviewsResp.json();
-        place.reviews = reviewsData.filter(r => r.place_id === placeId);
+        const pid = parseInt(placeId, 10);
+        place.reviews = reviewsData.filter(r => parseInt(r.place_id, 10) === pid);
       } else {
         place.reviews = [];
       }
