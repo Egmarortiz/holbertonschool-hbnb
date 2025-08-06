@@ -47,7 +47,8 @@ main {
 }
 
 .place-card,
-.review-card {
+.review-card,
+.place-details{
     margin: 20px;
     padding: 10px;
     border: 1px solid #ddd;
@@ -78,10 +79,6 @@ main {
 .error {
     color: red;
     margin-top: 10px;
-}
-
-.place-details {
-    margin: 20px;
 }
 
 .place-info {

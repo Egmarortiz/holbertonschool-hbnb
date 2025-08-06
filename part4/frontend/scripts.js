@@ -141,22 +141,15 @@ function displayPlaces(places) {
 
     const titleEl = document.createElement('h2');
     titleEl.textContent = place.title;
-
-    const descEl = document.createElement('p');
-    descEl.textContent = place.description || '';
-
-    const locEl = document.createElement('p');
-    locEl.textContent = `Location: ${place.latitude}, ${place.longitude}`;
-
     const priceEl = document.createElement('p');
-    priceEl.textContent = `Price: $${place.price}`;
+    priceEl.textContent = `$${place.price} per night`;
 
     const detailsLink = document.createElement('a');
     detailsLink.href = `place.html?id=${place.id}`;
     detailsLink.className = 'details-button';
     detailsLink.textContent = 'View Details';
 
-    item.append(titleEl, descEl, locEl, priceEl, detailsLink);
+    item.append(titleEl, priceEl, detailsLink);
     list.appendChild(item);
   });
 }
@@ -207,6 +200,24 @@ async function fetchPlaceDetails(token, placeId) {
         const reviewsData = await reviewsResp.json();
         const pid = parseInt(placeId, 10);
         place.reviews = reviewsData.filter(r => parseInt(r.place_id, 10) === pid);
+        // fetch user names for each review
+        const userPromises = place.reviews.map(r =>
+          fetch(`http://127.0.0.1:5000/api/v1/users/${r.user_id}`)
+        );
+        const userResponses = await Promise.all(userPromises);
+        for (let i = 0; i < userResponses.length; i++) {
+          const resp = userResponses[i];
+          if (resp.ok) {
+            try {
+              const user = await resp.json();
+              place.reviews[i].user_name = `${user.first_name} ${user.last_name}`;
+            } catch (e) {
+              place.reviews[i].user_name = '';
+            }
+          } else {
+            place.reviews[i].user_name = '';
+          }
+        }
       } else {
         place.reviews = [];
       }
@@ -225,14 +236,23 @@ function displayPlaceDetails(place) {
   const detailsSection = document.getElementById('place-details');
   const reviewsSection = document.getElementById('reviews');
   if (!detailsSection) return;
-
   detailsSection.innerHTML = '';
+  detailsSection.classList.add('place-details');
+
   const nameEl = document.createElement('h2');
   nameEl.textContent = place.title || place.name || 'Untitled place';
-  const descEl = document.createElement('p');
-  descEl.textContent = place.description || '';
+
+  const hostEl = document.createElement('p');
+  hostEl.className = 'place-info';
+  hostEl.textContent = `Host: ${place.owner ? `${place.owner.first_name} ${place.owner.last_name}` : 'Unknown'}`;
+
   const priceEl = document.createElement('p');
+  priceEl.className = 'place-info';
   priceEl.textContent = `Price: $${place.price}`;
+
+  const descEl = document.createElement('p');
+  descEl.className = 'place-info';
+  descEl.textContent = place.description || '';
 
   const amenitiesTitle = document.createElement('h3');
   amenitiesTitle.textContent = 'Amenities';
@@ -243,19 +263,26 @@ function displayPlaceDetails(place) {
     amenitiesList.appendChild(li);
   });
 
-  detailsSection.append(nameEl, descEl, priceEl, amenitiesTitle, amenitiesList);
+  detailsSection.append(nameEl, hostEl, priceEl, descEl, amenitiesTitle, amenitiesList);
 
   if (reviewsSection) {
     reviewsSection.innerHTML = '';
-    const reviewsTitle = document.createElement('h3');
-    reviewsTitle.textContent = 'Reviews';
-    const reviewsList = document.createElement('ul');
     (place.reviews || []).forEach(review => {
-      const li = document.createElement('li');
-      li.textContent = `${review.text || ''} - Rating: ${review.rating || ''}`;
-      reviewsList.appendChild(li);
+      const card = document.createElement('div');
+      card.className = 'review-card';
+
+      const commentEl = document.createElement('p');
+      commentEl.textContent = review.text || '';
+
+      const userEl = document.createElement('p');
+      userEl.textContent = review.user_name || '';
+
+      const ratingEl = document.createElement('p');
+      ratingEl.textContent = `Rating: ${review.rating || ''}`;
+
+      card.append(commentEl, userEl, ratingEl);
+      reviewsSection.appendChild(card);
     });
-    reviewsSection.append(reviewsTitle, reviewsList);
   }
 }
 
