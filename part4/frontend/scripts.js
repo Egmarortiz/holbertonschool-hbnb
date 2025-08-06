@@ -33,8 +33,20 @@ function checkAuthentication() {
   const token = getCookie('token');
   const loginLink = document.getElementById('login-link') ||
     document.querySelector('.login-button');
+  const logoutLink = document.getElementById('logout-link');
   if (loginLink) {
     loginLink.style.display = token ? 'none' : 'block';
+  }
+  if (logoutLink) {
+    logoutLink.style.display = token ? 'block' : 'none';
+    if (!logoutLink.dataset.listener) {
+      logoutLink.addEventListener('click', e => {
+        e.preventDefault();
+        setCookie('token', '', -1);
+        window.location.href = 'index.html';
+      });
+      logoutLink.dataset.listener = 'true';
+    }
   }
   return token;
 }
@@ -175,15 +187,7 @@ async function fetchPlaceDetails(token, placeId) {
     const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, { headers });
     if (!response.ok) throw new Error('Failed to fetch place details');
     const place = await response.json();
-
-    if (!place.reviews) {
-      try {
-        const revRes = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}/reviews`);
-        if (revRes.ok) place.reviews = await revRes.json();
-      } catch (e) {
-        // ignore errors fetching reviews
-      }
-    }
+    place.reviews = place.reviews || [];
 
     displayPlaceDetails(place);
   } catch (error) {
@@ -256,14 +260,7 @@ function showAddReviewForm(placeId, token) {
     const text = document.getElementById('review').value;
     const rating = document.getElementById('rating').value;
     try {
-      const resp = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}/reviews`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ text, rating })
-      });
+      const resp = await submitReview(token, placeId, text, rating);
       if (!resp.ok) throw new Error('Failed to submit review');
       form.reset();
       fetchPlaceDetails(token, placeId);
