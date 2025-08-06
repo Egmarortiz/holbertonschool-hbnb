@@ -3,35 +3,47 @@
   You'll probably need to override some of theese styles.
 */
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 body {
-    background-color: #f4f4f4;
+    background-color: #f7f7f7;
     color: #333;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 header {
-    background-color: #333;
-    color: #fff;
-    padding: 1rem;
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    color: #333;
+    padding: 1rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+nav {
+    display: flex;
+    gap: 20px;
 }
 
 nav a {
-    color: #fff;
+    color: #333;
     text-decoration: none;
-    margin-left: 1rem;
 }
 
 main {
-    padding: 2rem;
+    padding: 2rem 0;
 }
 
 .logo {
@@ -39,32 +51,51 @@ main {
 }
 
 .login-button,
-.logout-button {
-    background-color: #fff;
-    color: #333;
-    padding: 0.5rem 1rem;
+.logout-button,
+.details-button,
+.add-review,
+button {
+    display: inline-block;
+    background-color: #FF5A5F;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
     border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover,
+.logout-button:hover,
+.details-button:hover,
+.add-review:hover,
+button:hover {
+    background-color: #e04e52;
+}
+
+#places-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
 }
 
 .place-card,
 .review-card,
-.place-details{
-    margin: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
+.place-details {
     background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.details-button,
-.add-review {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 0.5rem 1rem;
-    background-color: #333;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 4px;
+.place-card:hover,
+.review-card:hover,
+.place-details:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .form {
@@ -74,7 +105,6 @@ main {
     border-radius: 10px;
     background-color: #fff;
 }
-
 
 .error {
     color: red;
@@ -91,4 +121,10 @@ footer {
     text-align: center;
     padding: 1rem;
     margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    #places-list {
+        grid-template-columns: 1fr;
+    }
 }
