@@ -76,7 +76,6 @@ function displayPlaces(places) {
       <p>Price: $${place.price}</p>
     `;
     list.appendChild(item);
-});
   });
 }
 // Handle price filtering
