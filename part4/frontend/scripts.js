@@ -39,11 +39,33 @@ function checkAuthentication() {
   return token;
 }
 
+// Require authentication for protected pages
+function requireAuth() {
+  const token = getCookie('token');
+  if (!token) {
+    window.location.href = 'index.html';
+  }
+  return token;
+}
+
 let placesCache = [];
 
 function getPlaceIdFromURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get('place_id') || params.get('id');
+}
+
+// Retrieve a place name and populate heading if present
+async function populatePlaceName(placeId) {
+  try {
+    const resp = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`);
+    if (!resp.ok) return;
+    const place = await resp.json();
+    const heading = document.getElementById('place-name');
+    if (heading) heading.textContent = place.title || place.name || '';
+  } catch (err) {
+    // Silently ignore errors populating the name
+  }
 }
 
 async function submitReview(token, placeId, reviewText, rating) {
@@ -56,6 +78,23 @@ async function submitReview(token, placeId, reviewText, rating) {
     body: JSON.stringify({ text: reviewText, rating: parseInt(rating, 10), place_id: placeId })
   });
   return response;
+}
+
+// Handle API responses for review submission
+async function handleResponse(response, form) {
+  if (response.ok) {
+    alert('Review submitted successfully!');
+    if (form) form.reset();
+  } else {
+    let errMsg = 'Failed to submit review';
+    try {
+      const data = await response.json();
+      if (data && data.error) errMsg = data.error;
+    } catch (e) {
+      // Ignore JSON parsing errors
+    }
+    alert(errMsg);
+  }
 }
 
 // Fetch places from the API
@@ -126,12 +165,6 @@ function handleLoginForm() {
       if (errorEl) errorEl.textContent = error.message || 'Login failed';
     }
   });
-}
-
-// Extract place ID from URL query string
-function getPlaceIdFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get('id');
 }
 
 // Fetch details for a specific place
@@ -242,7 +275,28 @@ function showAddReviewForm(placeId, token) {
 
 // Execute when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
+  const currentPage = window.location.pathname.split('/').pop();
   const token = checkAuthentication();
+
+  if (currentPage === 'add_review.html') {
+    const authToken = requireAuth();
+    const placeId = getPlaceIdFromURL();
+    if (placeId) {
+      populatePlaceName(placeId);
+      const form = document.getElementById('review-form');
+      if (form) {
+        form.addEventListener('submit', async event => {
+          event.preventDefault();
+          const text = document.getElementById('review').value;
+          const rating = document.getElementById('rating').value;
+          const resp = await submitReview(authToken, placeId, text, rating);
+          await handleResponse(resp, form);
+        });
+      }
+    }
+    return;
+  }
+
   const placeId = getPlaceIdFromURL();
 
   if (placeId) {
