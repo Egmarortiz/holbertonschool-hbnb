@@ -16,6 +16,29 @@ function setCookie(name, value, days) {
   document.cookie = name + '=' + (value || '') + expires + '; path=/';
 }
 
+// Micro-interaction helpers
+function fadeInElement(el, delay = 0) {
+  if (!el) return;
+  el.style.opacity = 0;
+  el.style.transition = 'opacity 0.5s ease';
+  setTimeout(() => {
+    el.style.opacity = 1;
+  }, delay);
+}
+
+function setupSmoothNavigation() {
+  document.body.addEventListener('click', e => {
+    const link = e.target.closest('a[href*=".html"]');
+    if (!link) return;
+    e.preventDefault();
+    const href = link.getAttribute('href');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      window.location.href = href;
+    }, 300);
+  });
+}
+
 async function loginUser(email, password) {
   const response = await fetch('http://127.0.0.1:5000/api/v1/login', {
     method: 'POST',
@@ -134,7 +157,7 @@ function displayPlaces(places) {
   const list = document.getElementById('places-list');
   if (!list) return;
   list.innerHTML = '';
-  places.forEach(place => {
+  places.forEach(place, index) => {
     const item = document.createElement('div');
     item.className = 'place-card';
     item.dataset.price = place.price;
@@ -151,6 +174,7 @@ function displayPlaces(places) {
 
     item.append(titleEl, priceEl, detailsLink);
     list.appendChild(item);
+    fadeInElement(item, index * 100);
   });
 }
 // Handle price filtering
@@ -264,10 +288,11 @@ function displayPlaceDetails(place) {
   });
 
   detailsSection.append(nameEl, hostEl, priceEl, descEl, amenitiesTitle, amenitiesList);
+  fadeInElement(detailsSection);
 
   if (reviewsSection) {
     reviewsSection.innerHTML = '';
-    (place.reviews || []).forEach(review => {
+    (place.reviews || []).forEach(review, index) => {
       const card = document.createElement('div');
       card.className = 'review-card';
 
@@ -282,6 +307,7 @@ function displayPlaceDetails(place) {
 
       card.append(commentEl, userEl, ratingEl);
       reviewsSection.appendChild(card);
+      fadeInElement(card, index * 100);
     });
   }
 }
@@ -326,6 +352,7 @@ function showAddReviewForm(placeId, token) {
 window.addEventListener('DOMContentLoaded', () => {
   const currentPage = window.location.pathname.split('/').pop();
   const token = checkAuthentication();
+  setupSmoothNavigation();
 
   if (currentPage === 'add_review.html') {
     const authToken = requireAuth();
