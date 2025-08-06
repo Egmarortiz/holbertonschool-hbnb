@@ -139,10 +139,11 @@ function displayPlaces(places) {
     item.className = 'place-card';
     item.dataset.price = place.price;
     item.innerHTML = `
-      <h2><a href="place.html?id=${place.id}">${place.title}</a></h2>
+      <h2>${place.title}</h2>
       <p>${place.description || ''}</p>
       <p>Location: ${place.latitude}, ${place.longitude}</p>
       <p>Price: $${place.price}</p>
+      <a href="place.html?id=${place.id}" class="details-button">View Details</a>
     `;
     list.appendChild(item);
   });
@@ -187,7 +188,18 @@ async function fetchPlaceDetails(token, placeId) {
     const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, { headers });
     if (!response.ok) throw new Error('Failed to fetch place details');
     const place = await response.json();
-    place.reviews = place.reviews || [];
+
+    try {
+      const reviewsResp = await fetch('http://127.0.0.1:5000/api/v1/reviews/');
+      if (reviewsResp.ok) {
+        const reviewsData = await reviewsResp.json();
+        place.reviews = reviewsData.filter(r => r.place_id === placeId);
+      } else {
+        place.reviews = [];
+      }
+    } catch (err) {
+      place.reviews = [];
+    }
 
     displayPlaceDetails(place);
   } catch (error) {
